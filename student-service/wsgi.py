@@ -1,8 +1,10 @@
 from app import create_app
+from flask_cors import CORS
 
 app = create_app()
 
+# Initialisation des CORS ici
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 if __name__ == "__main__":
-    # Uniquement pour du debug local hors conteneur ; en production
-    # le conteneur utilise gunicorn (voir Dockerfile / CMD).
     app.run(host="0.0.0.0", port=5001)

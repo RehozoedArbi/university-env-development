@@ -6,4 +6,8 @@ dist/
 target/
 .idea/
 *.iml
-postgres_data/
+lint/lint/
+lint/lint-reports/
+enrollment-service/.venv/
+enrollment-service/.pytest_cache/
+student-service/.pytest_cache/

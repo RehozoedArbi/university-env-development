@@ -1,21 +1,27 @@
 package com.university.teacheradmin.exception;
 
-import com.university.teacheradmin.dto.ErrorResponse;
-import com.university.teacheradmin.logging.StructuredLogger;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.university.teacheradmin.dto.ErrorResponse;
+import com.university.teacheradmin.logging.StructuredLogger;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private final StructuredLogger logger = new StructuredLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleMalformedBody(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse("Corps de requête manquant ou invalide"));
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> details = new HashMap<>();
