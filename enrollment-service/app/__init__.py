@@ -3,6 +3,10 @@ import time
 from flask import Flask, g, jsonify, request
 from flask_cors import CORS
 
+# Import des instrumentations OpenTelemetry
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+
 from .config import Config
 from .logging_utils import configure_logging, log_inbound_request, new_trace_id
 from .metrics import init_metrics
@@ -18,6 +22,12 @@ def create_app() -> Flask:
     db.init_app(app)
 
     init_metrics(app)
+
+    # Activer l'instrumentation OpenTelemetry pour Flask (génère les traces entrantes)
+    FlaskInstrumentor().instrument_app(app)
+
+    # Activer l'instrumentation pour requests (génère les spans sortants pour le Service Dependency Graph)
+    RequestsInstrumentor().instrument()
 
     logger = configure_logging(Config.SERVICE_NAME)
     app.extensions["structured_logger"] = logger
