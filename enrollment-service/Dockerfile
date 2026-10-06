@@ -1,23 +1,24 @@
-# ============================================================
-# Stage 1 : Build des dépendances
-# ============================================================
-FROM cgr.dev/chainguard/python:latest-dev AS builder
+# syntax=docker/dockerfile:1
 
-WORKDIR /build
+# ============================================================
+# Stage 1 : Build des dépendances (venv)
+# ============================================================
+FROM python:3.14 AS builder
 
 USER root
+WORKDIR /app
+
+# Outils de compilation (uniquement nécessaires si des wheels sont à compiler)
 RUN apk add --no-cache build-base postgresql-dev
 
-COPY requirements.txt .
+# Venv isolé, copié tel quel dans l'image finale
+RUN python -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
 
-RUN python -m pip install \
-        --no-cache-dir \
-        --upgrade pip \
-    && python -m pip install \
-        --no-cache-dir \
-        --prefix=/install \
-        --ignore-installed \
-        -r requirements.txt
+COPY requirements.txt .
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip \
+    && pip install -r requirements.txt
 
 # ============================================================
 # Stage 2 : Runtime
@@ -26,15 +27,14 @@ FROM python:3.14-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PYTHONPATH="/usr/local/lib/python3.14/site-packages"
+    PATH="/app/venv/bin:$PATH"
 
 WORKDIR /app
 
-COPY --from=builder /install /usr/local
-COPY app ./app
-COPY migrations ./migrations
-COPY alembic.ini wsgi.py entrypoint.py ./
+COPY --from=builder --chown=nonroot:nonroot /app/venv /app/venv
+COPY --chown=nonroot:nonroot app ./app
+COPY --chown=nonroot:nonroot migrations ./migrations
+COPY --chown=nonroot:nonroot alembic.ini wsgi.py entrypoint.py ./
 
 USER nonroot
 
