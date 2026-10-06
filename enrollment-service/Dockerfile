@@ -22,12 +22,12 @@ RUN python -m pip install \
 # ============================================================
 # Stage 2 : Runtime
 # ============================================================
-FROM cgr.dev/chainguard/python:3.14
+FROM cgr.dev/chainguard/python:latest
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PYTHONPATH="/usr/local/lib/python3.14/site-packages"
+    PYTHONPATH="/usr/local/lib/python/site-packages"
 
 WORKDIR /app
 
