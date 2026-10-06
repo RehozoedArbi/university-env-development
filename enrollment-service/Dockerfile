@@ -40,6 +40,6 @@ COPY alembic.ini wsgi.py entrypoint.py ./
 
 USER nonroot
 
-EXPOSE 5001
+EXPOSE 5003
 
 ENTRYPOINT ["python", "entrypoint.py"]
