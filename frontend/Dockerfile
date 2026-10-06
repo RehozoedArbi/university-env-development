@@ -34,4 +34,4 @@ COPY --from=builder /build/dist /usr/share/nginx/html
 # Copie le fichier désigné par la variable ARG
 COPY ${NGINX_CONFIG} /etc/nginx/conf.d/default.conf
 
-EXPOSE 8080
+EXPOSE 80
