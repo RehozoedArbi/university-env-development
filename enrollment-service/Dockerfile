@@ -5,8 +5,6 @@ FROM cgr.dev/chainguard/python:latest-dev AS builder
 
 WORKDIR /build
 
-# La variante -dev fournit un shell + pip + apk (gestionnaire Wolfi)
-# gcc/libpq-dev deviennent :
 USER root
 RUN apk add --no-cache build-base postgresql-dev
 
@@ -24,12 +22,12 @@ RUN python -m pip install \
 # ============================================================
 # Stage 2 : Runtime
 # ============================================================
-FROM cgr.dev/chainguard/python:latest
+FROM cgr.dev/chainguard/python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PYTHONPATH="/usr/local/lib/python3.14/site-packages:${PYTHONPATH}"
+    PYTHONPATH="/usr/local/lib/python3.12/site-packages"
 
 WORKDIR /app
 
