@@ -23,7 +23,8 @@ FROM python:${PYTHON_VERSION}-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    HOME=/tmp
 
 # libpq5 : lib client runtime pour psycopg2 (pas besoin des headers de dev)
 RUN apt-get update \
@@ -39,12 +40,12 @@ WORKDIR /app
 COPY --from=builder /install /usr/local
 COPY app ./app
 COPY migrations ./migrations
-COPY alembic.ini wsgi.py entrypoint.py ./
+COPY alembic.ini wsgi.py entrypoint.sh gunicorn.conf.py ./
 
-RUN chown -R appuser:appgroup /app
+RUN chmod +x entrypoint.sh && chown -R appuser:appgroup /app
 
 USER appuser
 
 EXPOSE 5003
 
-ENTRYPOINT ["python", "entrypoint.py"]
+ENTRYPOINT ["./entrypoint.sh"]
